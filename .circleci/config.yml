@@ -42,7 +42,7 @@ jobs:
               # Check if IS_PULL_REQUEST is set to true
               if [ "$IS_PULL_REQUEST" = "true" ]; then
                 # Check if MESSAGE contains the word "circleci"
-                if [ "$MESSAGE" =~ "circleci" ]; then
+                if [[ "$MESSAGE" =~ "circleci" ]]; then
                   echo "All conditions are met!"
                   exit 0
                 else
