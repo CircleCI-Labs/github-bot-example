@@ -29,12 +29,12 @@ jobs:
             echo "export USERNAME='$(echo ${WEBHOOK_BODY} | jq -r '.comment.user.login')'" >> $BASH_ENV
             echo "export IS_PULL_REQUEST='$(echo ${WEBHOOK_BODY} | jq -e '.issue.pull_request' >/dev/null && echo true || echo false)'" >> $BASH_ENV
             source $BASH_ENV
-            echo ${AUTHOR_ASSOCIATION} SPACE ${MESSAGE} SPACE ${USERNAME} SPACE ${IS_PULL_REQUEST}
+            echo "User: ${USERNAME} Author Association: ${AUTHOR_ASSOCIATION} Pull Request: ${IS_PULL_REQUEST} Message: ${MESSAGE}"
       - run:
           name: Determine Valid User and Command
           command: |
-            # Check if AUTHOR_ASSOCIATION is COLLABORATOR or MEMBER or OWNER
-            if [[ "$AUTHOR_ASSOCIATION" == "COLLABORATOR" || "$AUTHOR_ASSOCIATION" == "MEMBER" || "$AUTHOR_ASSOCIATION" == "OWNER" ]]; then
+            # Check if AUTHOR_ASSOCIATION is COLLABORATOR or MEMBER or OWNER or CONTRIBUTOR
+            if [[ "$AUTHOR_ASSOCIATION" == "COLLABORATOR" || "$AUTHOR_ASSOCIATION" == "MEMBER" || "$AUTHOR_ASSOCIATION" == "OWNER" || "$AUTHOR_ASSOCIATION" == "CONTRIBUTOR"]]; then
               # Check if IS_PULL_REQUEST is set to true
               if [[ "$IS_PULL_REQUEST" == "true" ]]; then
                 # Check if MESSAGE contains the word "circleci"
@@ -50,7 +50,7 @@ jobs:
                 exit 1
               fi
             else
-              echo "AUTHOR_ASSOCIATION is not COLLABORATOR, MEMBER, or OWNER"
+              echo "AUTHOR_ASSOCIATION is not COLLABORATOR, MEMBER, OWNER or CONTRIBUTOR"
               exit 1
             fi
 
