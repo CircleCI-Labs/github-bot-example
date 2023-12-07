@@ -21,7 +21,7 @@ jobs:
     environment:
       WEBHOOK_BODY: << pipeline.trigger_parameters.webhook.body >>
     steps:
-      - run: echo "Hello :)"
+      - run: echo "${WEBHOOK_BODY}"
       - run: 
           command: |
             echo "export AUTHOR_ASSOCIATION=$(echo ${WEBHOOK_BODY} | jq -r '.comment.author_association')" >> $BASH_ENV
