@@ -30,6 +30,29 @@ jobs:
             echo "export IS_PULL_REQUEST='$(echo ${WEBHOOK_BODY} | jq -e '.issue.pull_request' >/dev/null && echo true || echo false)'" >> $BASH_ENV
             source $BASH_ENV
             echo ${AUTHOR_ASSOCIATION} SPACE ${MESSAGE} SPACE ${USERNAME} SPACE ${IS_PULL_REQUEST}
+      - run:
+          name: Determine Valid User and Command
+          command: |
+            # Check if AUTHOR_ASSOCIATION is COLLABORATOR or MEMBER or OWNER
+            if [[ "$AUTHOR_ASSOCIATION" == "COLLABORATOR" || "$AUTHOR_ASSOCIATION" == "MEMBER" || "$AUTHOR_ASSOCIATION" == "OWNER" ]]; then
+              # Check if IS_PULL_REQUEST is set to true
+              if [[ "$IS_PULL_REQUEST" == "true" ]]; then
+                # Check if MESSAGE contains the word "circleci"
+                if [[ "$MESSAGE" == *"circleci"* ]]; then
+                  echo "All conditions are met!"
+                  exit 0
+                else
+                  echo "MESSAGE does not contain the word 'circleci'"
+                  exit 1
+                fi
+              else
+                echo "IS_PULL_REQUEST is not set to true"
+                exit 1
+              fi
+            else
+              echo "AUTHOR_ASSOCIATION is not COLLABORATOR, MEMBER, or OWNER"
+              exit 1
+            fi
 
 # Orchestrate our job run sequence
 workflows:
