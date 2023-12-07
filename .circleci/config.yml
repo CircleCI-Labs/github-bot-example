@@ -22,7 +22,13 @@ jobs:
       WEBHOOK_BODY: << pipeline.trigger_parameters.webhook.body >>
     steps:
       - run: echo "Hello :)"
-      - run: echo "${WEBHOOK_BODY}"
+      - run: 
+          command: |
+            echo "export AUTHOR_ASSOCIATION=$(cat your_file.json | jq -r '.issue.author_association')" >> $BASH_ENV
+            echo "export MESSAGE=$(cat your_file.json | jq -r '.comment.body')" >> $BASH_ENV
+            echo "export USERNAME=$(cat your_file.json | jq -r '.issue.user.login')" >> $BASH_ENV
+            source $BASH_ENV
+            echo ${AUTHOR_ASSOCIATION} SPACE ${MESSAGE} SPACE  ${USERNAME}
 
 # Orchestrate our job run sequence
 workflows:
