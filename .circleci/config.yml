@@ -18,8 +18,11 @@ jobs:
     docker:
        - image: cimg/base:2023.03
     resource_class: small
+    environment:
+      WEBHOOK_BODY: << pipeline.trigger_parameters.webhook.body >>
     steps:
       - run: echo "Hello :)"
+      - run: echo "${WEBHOOK_BODY}"
 
 # Orchestrate our job run sequence
 workflows:
