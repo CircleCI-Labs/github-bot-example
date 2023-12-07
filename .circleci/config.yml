@@ -24,9 +24,9 @@ jobs:
       - run: echo "Hello :)"
       - run: 
           command: |
-            echo "export AUTHOR_ASSOCIATION=$(echo ${WEBHOOK_BODY} | jq -r '.issue.author_association')" >> $BASH_ENV
-            echo "export MESSAGE=$(echo ${WEBHOOK_BODY}  | jq -r '.comment.body')" >> $BASH_ENV
-            echo "export USERNAME=$(echo ${WEBHOOK_BODY}  | jq -r '.issue.user.login')" >> $BASH_ENV
+            echo "export AUTHOR_ASSOCIATION=$(echo ${WEBHOOK_BODY} | jq -r '.comment.author_association')" >> $BASH_ENV
+            echo "export MESSAGE=$(echo ${WEBHOOK_BODY} | jq -r '.comment.body')" >> $BASH_ENV
+            echo "export USERNAME=$(echo ${WEBHOOK_BODY} | jq -r '.comment.user.login')" >> $BASH_ENV
             source $BASH_ENV
             echo ${AUTHOR_ASSOCIATION} SPACE ${MESSAGE} SPACE  ${USERNAME}
 
