@@ -14,12 +14,21 @@ jobs:
     steps:
       - checkout
       - run: echo "this is the test job"
+  inspect:
+    docker:
+       - image: cimg/base:2023.03
+    resource_class: small
+    steps:
+      - run: echo "Hello :)"
 
 # Orchestrate our job run sequence
 workflows:
   build_and_test:
     jobs:
-      - build
+      - inspect
+      - build:
+          requires:
+            - "inspect"
       - test:
           requires:
             - build
