@@ -1,0 +1,71 @@
+version: 2.1
+
+# Define the jobs we want to run for this project
+jobs:
+  build:
+    docker:
+      - image: cimg/base:2023.03
+    steps:
+      - checkout
+      - run: echo "this is the build job"
+  test:
+    docker:
+      - image: cimg/base:2023.03
+    steps:
+      - checkout
+      - run: echo "this is the test job"
+  inspect:
+    docker:
+       - image: cimg/base:2023.03
+    resource_class: small
+    environment:
+      WEBHOOK_BODY: << pipeline.trigger_parameters.webhook.body >>
+    steps:
+      - run:
+          name: Webhook Body for Debugging
+          command: |
+            echo "${WEBHOOK_BODY}"
+      - run:
+          name: Exact Payload Information
+          command: |
+            echo "export AUTHOR_ASSOCIATION='$(echo ${WEBHOOK_BODY} | jq -r '.comment.author_association')'" >> $BASH_ENV
+            echo "export MESSAGE='$(echo ${WEBHOOK_BODY} | jq -r '.comment.body')'" >> $BASH_ENV
+            echo "export USERNAME='$(echo ${WEBHOOK_BODY} | jq -r '.comment.user.login')'" >> $BASH_ENV
+            echo "export IS_PULL_REQUEST='$(echo ${WEBHOOK_BODY} | jq -e '.issue.pull_request' >/dev/null && echo true || echo false)'" >> $BASH_ENV
+            source $BASH_ENV
+            echo "User: ${USERNAME} Author Association: ${AUTHOR_ASSOCIATION} Pull Request: ${IS_PULL_REQUEST} Message: ${MESSAGE}"
+      - run:
+          name: Determine Valid User and Command
+          command: |
+            # Check if AUTHOR_ASSOCIATION is COLLABORATOR or MEMBER or OWNER or CONTRIBUTOR
+            if [ "$AUTHOR_ASSOCIATION" = "COLLABORATOR" ] || [ "$AUTHOR_ASSOCIATION" = "MEMBER" ] || [ "$AUTHOR_ASSOCIATION" = "OWNER" ] || [ "$AUTHOR_ASSOCIATION" = "CONTRIBUTOR" ]; then
+              # Check if IS_PULL_REQUEST is set to true
+              if [ "$IS_PULL_REQUEST" = "true" ]; then
+                # Check if MESSAGE contains the word "circleci"
+                if [[ "$MESSAGE" =~ "circleci" ]]; then
+                  echo "All conditions are met!"
+                  exit 0
+                else
+                  echo "MESSAGE does not contain the word 'circleci'"
+                  exit 1
+                fi
+              else
+                echo "IS_PULL_REQUEST is not set to true"
+                exit 1
+              fi
+            else
+              echo "AUTHOR_ASSOCIATION is not COLLABORATOR, MEMBER, OWNER or CONTRIBUTOR"
+              exit 1
+            fi
+
+# Orchestrate our job run sequence
+workflows:
+  build_and_test:
+    jobs:
+      - inspect
+      - build:
+          requires:
+            - "inspect"
+      - test:
+          requires:
+            - build
