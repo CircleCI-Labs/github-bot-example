@@ -10,3 +10,11 @@ This is accomplished by running a small docker job which will inspect the JSON p
 - If the comment contains the word `circleci`
 
 If all 3 conditions are met, the pipeline will continue on to the normal pipeline. If not, the pipeline will fail and not continue.
+
+**Disclaimer:**
+
+CircleCI Labs, including this repo, is a collection of solutions developed by members of CircleCI's field engineering teams through our engagement with various customer needs.
+
+-   ✅ Created by engineers @ CircleCI
+-   ✅ Used by real CircleCI customers
+-   ❌ **not** officially supported by CircleCI support
